@@ -1,10 +1,17 @@
+import cv2
+import threading
 import tkinter as tk
 from tkinter import ttk
 from datetime import datetime
-import cv2
 from PIL import Image, ImageTk  
+from PoseModule import humanDetector
+
+#Queria usar flet para cambiar la interfaz 
+#import flet as ft
 
 cap = cv2.VideoCapture(0)
+
+detector = humanDetector(cap)
 
 def agregar_notificacion(mensaje):
     fecha = datetime.now().strftime("%H:%M:%S")
@@ -17,8 +24,8 @@ def simular_alerta():
 
 def actualizar_video():
     """Función para capturar frames y mostrarlos en la interfaz"""
-    ret, frame = cap.read()
-    if ret:
+    frame = detector.findHuman()
+    if True:
         frame = cv2.resize(frame, (400, 250))
         
         cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -29,7 +36,7 @@ def actualizar_video():
         lbl_video.imgtk = imgtk
         lbl_video.configure(image=imgtk)
     
-    lbl_video.after(10, actualizar_video)
+    lbl_video.after(30, actualizar_video)
 
 ventana = tk.Tk()
 ventana.title("Sistema de Alarma Inteligente")
