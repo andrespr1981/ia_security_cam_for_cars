@@ -3,12 +3,11 @@ import time
 import base64
 import threading
 import flet as ft
-from handleCSV import *
-from widgets import *
-from PoseModule import humanDetector
-    
+from components.handleCSV import *
+from components.widgets import *
+#from FaceRecognition import FaceRecognition
+
 cap = cv2.VideoCapture(0)
-detector = humanDetector(cap)
 
 def main(page: ft.Page):
     page.title = 'SecureCar IA'
@@ -23,9 +22,9 @@ def main(page: ft.Page):
     ia_is_loading = False
     alerts = read_csv()
     alerts_list = []
-    #live = ft.Image()
-    live = ft.Image(src='images/test.jpg',fit=ft.ImageFit.CONTAIN,border_radius=20)
-    live_container = ft.Container(content=live,alignment=ft.alignment.top_center,width=800)
+    live = ft.Image(src='')
+    #live = ft.Image(src='images/test.jpg',fit=ft.ImageFit.CONTAIN,border_radius=20)
+    live_container = ft.Container(content=live,alignment=ft.alignment.topCenter,width=800)
 
     def toggle(value):
         nonlocal ia_activated
@@ -133,7 +132,7 @@ def main(page: ft.Page):
         while is_cam_activated:
             if ia_activated:
                 live_container.content = live
-                frame = detector.findObjets()
+                #frame = detector.findObjets()
             else:
                 ret,frame = cap.read()
                 if not ret:
@@ -152,10 +151,5 @@ def main(page: ft.Page):
     
     threading.Thread(target=video_loop, daemon=True).start()
                 
-        
-        
 
-
-
-
-ft.app(target=main)
+ft.run(main)
