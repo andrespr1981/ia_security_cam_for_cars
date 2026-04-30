@@ -6,19 +6,20 @@ from deepface import DeepFace
 
 class FaceRecognition():
     def __init__(self):
+        #self.cap = cap
         self.embeddings = []
         self.labels = []
 
-        if os.path.exists('svm_model.pkl'):
-            self.svm_model = joblib.load('svm_model.pkl')
-            self.embeddings = joblib.load("embeddings.pkl")
-            self.labels = joblib.load("labels.pkl")
+        if os.path.exists('model/svm_model.pkl'):
+            self.svm_model = joblib.load('model/svm_model.pkl')
+            self.embeddings = joblib.load("model/embeddings.pkl")
+            self.labels = joblib.load("model/labels.pkl")
         else:
             self.svm_model = svm.SVC(kernel='linear', probability=True)
 
     def create_embbedings(self):
         self.embeddings = []
-        dir = 'fotos'
+        dir = 'faces'
         for person in os.listdir(dir):
             face_dir = os.path.join(dir, person)
 
@@ -39,19 +40,19 @@ class FaceRecognition():
 
                 except Exception as e:
                     print(f"Error en {file}: {e}")  
-        joblib.dump(self.embeddings, "embeddings.pkl") 
-        joblib.dump(self.labels, "labels.pkl")
+        joblib.dump(self.embeddings, "model/embeddings.pkl") 
+        joblib.dump(self.labels, "model/labels.pkl")
 
     def train_model(self):
         if len(set(self.labels)) < 2:
             print("Error: necesitas al menos 2 clases")
             return
         self.svm_model.fit(self.embeddings, self.labels)
-        joblib.dump(self.svm_model, "svm_model.pkl")
+        joblib.dump(self.svm_model, "model/svm_model.pkl")
         return
 
-    def findFaces(self,cap):
-        ret, frame = cap.read()
+    def findFaces(self):
+        ret, frame = self.cap.read()
 
         if not ret:
             return
@@ -72,3 +73,8 @@ class FaceRecognition():
             print("Error:", e)
 
         return frame
+    
+
+#detector = FaceRecognition()
+#detector.create_embbedings()
+#detector.train_model()

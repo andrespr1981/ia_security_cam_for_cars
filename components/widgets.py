@@ -17,3 +17,4 @@ def alert_container(title,text,time,bg=ft.Colors.RED_100):
             height=80,
         )
 
+
