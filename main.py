@@ -11,17 +11,16 @@ cap = cv2.VideoCapture(0)
 #detector = FaceRecognition(cap=cap)
 
 def main(page: ft.Page):
-    page.title = 'SecureCar IA'
+    page.title = 'Driver Guard'
     page.theme_mode = ft.ThemeMode.SYSTEM
     page.window_maximized = True
     page.window_full_screen = True
     page.window_resizable = True
-    page.padding = 20
 
     ia_activated = True
 
     video = ft.Image(src='images/test.jpg')
-    video_container = ft.Container(content=video,alignment=ft.Alignment.CENTER,width=800)
+    video_container = ft.Container(content=video,alignment=ft.Alignment.CENTER,width=800,border=ft.BorderRadius.all(10))
 
     page.add(
         Navbar(page),
