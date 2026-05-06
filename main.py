@@ -2,13 +2,14 @@ import cv2
 import time
 import base64
 import threading
+import asyncio
 import flet as ft
 from components.navbar import Navbar
 from utils.csv_handler import *
-#from FaceRecognition import FaceRecognition
+from FaceRecognition import FaceRecognition
 
 cap = cv2.VideoCapture(0)
-#detector = FaceRecognition(cap=cap)
+detector = FaceRecognition(cap=cap)
 
 def main(page: ft.Page):
     page.title = 'Driver Guard'
@@ -19,7 +20,7 @@ def main(page: ft.Page):
 
     ia_activated = True
 
-    video = ft.Image(src='images/test.jpg')
+    video = ft.Image(src='images/test.jpg',gapless_playback=True)
     video_container = ft.Container(content=video,alignment=ft.Alignment.CENTER,width=800,border=ft.BorderRadius.all(10))
 
     page.add(
@@ -27,30 +28,32 @@ def main(page: ft.Page):
         ft.SafeArea(content=video_container)
     )
 
-    def video_loop():
+    async def video_loop():
+        nonlocal video, video_container
         frame = None
+
         while cap.isOpened():
 
             if ia_activated:
                 video_container.content = video
                 frame = detector.findFaces()
             else:
-                ret,frame = cap.read()
+                ret, frame = cap.read()
                 if not ret:
                     continue
 
             if frame is not None:
-                    _, buffer = cv2.imencode('.jpg', frame)
-                    img_base64 = base64.b64encode(buffer).decode()
+                _, buffer = cv2.imencode('.jpg', frame)
+                img_base64 = base64.b64encode(buffer).decode("utf-8")
 
-                    video.src_base64 = img_base64
-                    page.update()
+                video.src = img_base64
             else:
                 video_container.content = ft.ProgressRing()
-                page.update()
-            time.sleep(0.03)
 
-    #threading.Thread(target=video_loop, daemon=True).start()
+            page.update()
+            await asyncio.sleep(0.03)  # 🔥 importante
+
+    page.run_task(video_loop)
                 
 
 ft.run(main)

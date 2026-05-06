@@ -6,3 +6,4 @@ Comandos para entorno virtual:
 - pip install opencv-python
 - pip install scikit-learn
 - pip install flet 
+- pip install Flask
