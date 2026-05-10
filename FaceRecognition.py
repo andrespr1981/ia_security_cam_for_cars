@@ -84,7 +84,7 @@ class FaceRecognition():
                     print('Max: ',max_proba)
                     print('Min: ',min_dist)
 
-                    if max_proba < 0.8 or min_dist > 7:
+                    if max_proba < 0.8 or min_dist > 10 or min_dist < 3:
                         self.pred = "Desconocido"
                     else:
                         self.pred = pred_class
@@ -122,8 +122,13 @@ class FaceRecognition():
                 self.running = False
                 break
     
-cap = cv2.VideoCapture(0) 
-detector = FaceRecognition(cap=cap)
-detector.findFaces(debug=True)
-#detector.create_embbedings()
-#detector.train_model()
+test = False
+train = False
+if(test):
+    cap = cv2.VideoCapture(0) 
+    detector = FaceRecognition(cap=cap)
+    detector.findFaces(debug=True)
+
+if(train):
+    detector.create_embbedings()
+    detector.train_model()

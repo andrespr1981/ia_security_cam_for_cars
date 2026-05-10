@@ -1,15 +1,17 @@
 import cv2
-import time
 import base64
-import threading
 import asyncio
 import flet as ft
 from components.navbar import Navbar
-from utils.csv_handler import *
-from FaceRecognition import FaceRecognition
+from components.info_container import info_container
+from components.alert_container import alert_container
+#from FaceRecognition import FaceRecognition
+from utils.csv_handler import read_csv,write_csv
 
-cap = cv2.VideoCapture(0)
-detector = FaceRecognition(cap=cap)
+
+
+#cap = cv2.VideoCapture(0)
+#detector = FaceRecognition(cap=cap)
 
 def main(page: ft.Page):
     page.title = 'Driver Guard'
@@ -19,13 +21,35 @@ def main(page: ft.Page):
     page.window_resizable = True
 
     ia_activated = True
+    recording_activated = False
+    today_alerts = 90
+    storage = 90
 
-    video = ft.Image(src='images/test.jpg',gapless_playback=True)
+    alerts = read_csv()
+
+    video = ft.Image(src='images/test.jpg',gapless_playback=True,border_radius=ft.BorderRadius.all(20))
     video_container = ft.Container(content=video,alignment=ft.Alignment.CENTER,width=800,border=ft.BorderRadius.all(10))
 
     page.add(
         Navbar(page),
-        ft.SafeArea(content=video_container)
+        ft.SafeArea(
+           content=ft.Row(
+               controls=[
+                   ft.Column(
+               controls=[
+                   video_container,
+                    ft.Container(
+                       content=ft.Row(controls=[
+                           info_container(ia_activated,recording_activated,today_alerts,storage),
+                       ])
+                    ),
+                   
+               ]
+            ),
+            alert_container(alerts)
+               ]
+           )
+        )
     )
 
     async def video_loop():
@@ -51,9 +75,10 @@ def main(page: ft.Page):
                 video_container.content = ft.ProgressRing()
 
             page.update()
-            await asyncio.sleep(0.03)  # 🔥 importante
+            await asyncio.sleep(0.03)
+          
 
-    page.run_task(video_loop)
+    #page.run_task(video_loop)
                 
 
 ft.run(main)
