@@ -13,7 +13,9 @@ class FaceRecognition():
         self.pred = '...'
         self.embeddings = []
         self.labels = []
-
+        self.face_detector = cv2.CascadeClassifier(
+            cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
+        )
         if os.path.exists('model/svm_model.pkl'):
             self.svm_model = joblib.load('model/svm_model.pkl')
             self.embeddings = joblib.load("model/embeddings.pkl")
@@ -63,57 +65,111 @@ class FaceRecognition():
         return
     
     def embedding_worker(self):
+
         while self.running:
+
             if not self.frame_queue.empty():
+
                 frame = self.frame_queue.get()
 
                 try:
-                    embedding = DeepFace.represent(
-                        img_path=frame,
-                        model_name="Facenet",
-                        enforce_detection=False
-                    )[0]["embedding"]
 
-                    proba = self.svm_model.predict_proba([embedding])[0]
-                    max_proba = max(proba)
-                    pred_class = self.svm_model.classes_[proba.argmax()]
+                    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-                    distancias = [np.linalg.norm(np.array(embedding) - np.array(e)) for e in self.embeddings]
-                    min_dist = min(distancias)
+                    faces = self.face_detector.detectMultiScale(
+                        gray,
+                        scaleFactor=1.1,
+                        minNeighbors=5,
+                        minSize=(80, 80)
+                    )
 
-                    print('Max: ',max_proba)
-                    print('Min: ',min_dist)
+                    results = []
 
-                    if max_proba < 0.8 or min_dist > 10 or min_dist < 3:
-                        self.pred = "Desconocido"
-                    else:
-                        self.pred = pred_class
+                    for (x, y, w, h) in faces:
+
+                        face_crop = frame[y:y+h, x:x+w]
+
+                        embedding = DeepFace.represent(
+                            img_path=face_crop,
+                            model_name="Facenet",
+                            enforce_detection=False
+                        )[0]["embedding"]
+
+                        proba = self.svm_model.predict_proba([embedding])[0]
+
+                        max_proba = max(proba)
+
+                        pred_class = self.svm_model.classes_[proba.argmax()]
+
+                        distancias = [
+                            np.linalg.norm(
+                                np.array(embedding) - np.array(e)
+                            )
+                            for e in self.embeddings
+                        ]
+
+                        min_dist = min(distancias)
+
+                        print("Max:", max_proba)
+                        print("Min:", min_dist)
+
+                        if max_proba < 0.8 or min_dist > 10 or min_dist < 3:
+                            pred = "Desconocido"
+                        else:
+                            pred = pred_class
+
+                        results.append({
+                            "name": pred,
+                            "box": (x, y, w, h)
+                        })
 
                     if not self.result_queue.full():
-                        self.result_queue.put(self.pred)
+                        self.result_queue.put(results)
 
                 except Exception as e:
                     print("Error en worker:", e)
 
-    def findFaces(self,debug=False):
+    def findFaces(self, debug=False):
+
+        results = []
 
         while True:
+
             ret, frame = self.cap.read()
+
             if not ret:
                 continue
-
-            #frame = cv2.resize(frame, (320, 240))
 
             if not self.frame_queue.full():
                 self.frame_queue.put(frame.copy())
 
             if not self.result_queue.empty():
-                self.pred = self.result_queue.get()
+                results = self.result_queue.get()
 
-            cv2.putText(frame, self.pred, (50, 50),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
+            for result in results:
 
-            if(debug):
+                x, y, w, h = result["box"]
+                name = result["name"]
+
+                cv2.rectangle(
+                    frame,
+                    (x, y),
+                    (x + w, y + h),
+                    (0, 255, 0),
+                    2
+                )
+
+                cv2.putText(
+                    frame,
+                    name,
+                    (x, y - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.9,
+                    (0, 255, 0),
+                    2
+                )
+
+            if debug:
                 cv2.imshow("Video", frame)
             else:
                 return frame
