@@ -8,14 +8,12 @@ from sklearn import svm
 from deepface import DeepFace
 
 class FaceRecognition():
-    def __init__(self,cap):
-        self.cap = cap
-        self.pred = '...'
-        self.embeddings = []
-        self.labels = []
-        self.face_detector = cv2.CascadeClassifier(
-            cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
-        )
+    def __init__(self):
+        self.timer = 0
+        self.pred = '.'
+        self.results = []
+        self.face_detector = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+
         if os.path.exists('model/svm_model.pkl'):
             self.svm_model = joblib.load('model/svm_model.pkl')
             self.embeddings = joblib.load("model/embeddings.pkl")
@@ -29,51 +27,14 @@ class FaceRecognition():
 
         self.worker_thread = threading.Thread(target=self.embedding_worker, daemon=True)
         self.worker_thread.start()
-
-    def create_embbedings(self):
-        self.embeddings = []
-        dir = 'faces'
-        for person in os.listdir(dir):
-            face_dir = os.path.join(dir, person)
-
-            for file in os.listdir(face_dir):
-                path = os.path.join(face_dir, file)
-
-                try:
-                    embedding = DeepFace.represent(
-                        img_path=path,
-                        model_name="Facenet",
-                        enforce_detection=False
-                    )[0]["embedding"]
-
-                    self.embeddings.append(embedding)
-                    self.labels.append(person)  
-
-                    print(f"Procesado: {file}")
-
-                except Exception as e:
-                    print(f"Error en {file}: {e}")  
-        joblib.dump(self.embeddings, "model/embeddings.pkl") 
-        joblib.dump(self.labels, "model/labels.pkl")
-
-    def train_model(self):
-        if len(set(self.labels)) < 2:
-            print("Error: necesitas al menos 2 clases")
-            return
-        self.svm_model.fit(self.embeddings, self.labels)
-        joblib.dump(self.svm_model, "model/svm_model.pkl")
-        return
     
     def embedding_worker(self):
 
         while self.running:
-
             if not self.frame_queue.empty():
-
                 frame = self.frame_queue.get()
 
                 try:
-
                     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
                     faces = self.face_detector.detectMultiScale(
@@ -110,9 +71,6 @@ class FaceRecognition():
 
                         min_dist = min(distancias)
 
-                        print("Max:", max_proba)
-                        print("Min:", min_dist)
-
                         if max_proba < 0.8 or min_dist > 10 or min_dist < 3:
                             pred = "Desconocido"
                         else:
@@ -129,13 +87,10 @@ class FaceRecognition():
                 except Exception as e:
                     print("Error en worker:", e)
 
-    def findFaces(self, debug=False):
-
-        results = []
-
+    def findFaces(self,cap, debug=False):
         while True:
 
-            ret, frame = self.cap.read()
+            ret, frame = cap.read()
 
             if not ret:
                 continue
@@ -144,9 +99,9 @@ class FaceRecognition():
                 self.frame_queue.put(frame.copy())
 
             if not self.result_queue.empty():
-                results = self.result_queue.get()
+               self.results = self.result_queue.get()
 
-            for result in results:
+            for result in self.results:
 
                 x, y, w, h = result["box"]
                 name = result["name"]
@@ -179,12 +134,8 @@ class FaceRecognition():
                 break
     
 test = False
-train = False
+
 if(test):
     cap = cv2.VideoCapture(0) 
-    detector = FaceRecognition(cap=cap)
-    detector.findFaces(debug=True)
-
-if(train):
-    detector.create_embbedings()
-    detector.train_model()
+    detector = FaceRecognition()
+    detector.findFaces(cap,debug=True)

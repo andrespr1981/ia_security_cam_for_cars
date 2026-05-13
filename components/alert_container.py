@@ -1,6 +1,12 @@
 import flet as ft
+from utils.csv_handler import delete_row
 
-def mini_alert_container(title,text,time,level):
+def mini_alert_container(alert_id,title,text,time,level,refresh):
+
+    def delete():
+        delete_row(alert_id)
+        refresh()
+
     color = ft.Colors.BLUE
     if level == '1':
         color = ft.Colors.YELLOW
@@ -33,19 +39,19 @@ def mini_alert_container(title,text,time,level):
         border_radius=10,
         width=500
     ),
-    ft.IconButton(icon=ft.Icons.DELETE)
+    ft.IconButton(icon=ft.Icons.DELETE,on_click=delete)
         ]
     )
-    
 
-def alert_container(data):
+def alert_container(data,refresh):
     alerts = []
     for alert in data:
-        alerts.append(mini_alert_container(alert['title'],alert['text'],alert['time'],alert['level']))
+        alerts.append(mini_alert_container(alert['id'],alert['title'],alert['text'],alert['time'],alert['level'],refresh))
     return ft.Container(
         content=ft.Column(
-            controls=alerts if alerts else ft.Text(value='No hay alertas'),
+            controls=alerts if alerts else [ft.Text(value='No hay alertas')],
             expand=True,
+            scroll='always'
         ),
         border=ft.Border.all(0.1),
         padding=10,
@@ -53,3 +59,5 @@ def alert_container(data):
         width=600,
         height=600
     )
+
+

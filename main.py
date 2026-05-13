@@ -4,14 +4,12 @@ import asyncio
 import flet as ft
 from components.navbar import Navbar
 from components.info_container import info_container
-from components.alert_container import alert_container
+from components.alert_container import alert_container, mini_alert_container
 #from FaceRecognition import FaceRecognition
 from utils.csv_handler import read_csv,write_csv
 
-
-
-#cap = cv2.VideoCapture(0)
-#detector = FaceRecognition(cap=cap)
+#ap = cv2.VideoCapture(0)
+#detector = FaceRecognition()
 
 def main(page: ft.Page):
     page.title = 'Driver Guard'
@@ -29,6 +27,27 @@ def main(page: ft.Page):
 
     video = ft.Image(src='images/test.jpg',gapless_playback=True,border_radius=ft.BorderRadius.all(20))
     video_container = ft.Container(content=video,alignment=ft.Alignment.CENTER,width=800,border=ft.BorderRadius.all(10))
+    alert_container_widget = None
+
+    def load_alerts():
+        alert_container_widget.content.controls.clear()
+        alerts = read_csv() 
+        for alert in alerts:
+
+            alert_container_widget.content.controls.append(
+                mini_alert_container(
+                    alert['id'],
+                    alert['title'],
+                    alert['text'],
+                    alert['time'],
+                    alert['level'],
+                    load_alerts
+                )
+            )
+
+        page.update()
+
+    alert_container_widget = alert_container(alerts,load_alerts)
 
     page.add(
         Navbar(page),
@@ -43,10 +62,9 @@ def main(page: ft.Page):
                            info_container(ia_activated,recording_activated,today_alerts,storage),
                        ])
                     ),
-                   
                ]
             ),
-            alert_container(alerts)
+            alert_container_widget
                ]
            )
         )
@@ -60,7 +78,7 @@ def main(page: ft.Page):
 
             if ia_activated:
                 video_container.content = video
-                frame = detector.findFaces()
+                frame = detector.findFaces(cap=cap)
             else:
                 ret, frame = cap.read()
                 if not ret:
@@ -77,7 +95,6 @@ def main(page: ft.Page):
             page.update()
             await asyncio.sleep(0.03)
           
-
     #page.run_task(video_loop)
                 
 
