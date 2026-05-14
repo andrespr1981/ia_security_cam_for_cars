@@ -1,4 +1,5 @@
 import csv
+import time
 
 def read_csv():
     alerts = []
@@ -25,3 +26,21 @@ def delete_row(id):
         if(row['id'] != id):
             new_rows.append(row)
     write_csv(new_rows)
+
+def insert_row(reason):
+        alerts = read_csv()
+        now = time.localtime()
+        if reason == 'Cara desconocida':
+            data = {'id':int(alerts[0]['id']) + 1,
+                    'title':reason,
+                    'text':'Se detecto una persona no identificada en el vehiculo, se guardo una fotografia de su rostro en la galeria de fotos tomadas.',
+                    'time':f'{now.tm_hour}:{now.tm_min}:{now.tm_sec}',
+                    'level':2}
+        if reason == 'Movimiento':
+            data = {'id':int(alerts[0]['id']) + 1,
+                    'title':reason,
+                    'text':'Se detecto movimiento constante en el vehiculo, y se guardo una fotografia en la galeria de fotos tomadas.',
+                    'time':f'{now.tm_hour}:{now.tm_min}:{now.tm_sec}',
+                    'level':2}
+        alerts.insert(0,data)
+        write_csv(alerts)

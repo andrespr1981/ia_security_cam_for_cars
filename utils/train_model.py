@@ -6,11 +6,9 @@ from deepface import DeepFace
 embeddings = []
 labels = []
 
-dir = 'faces'
+dir = 'faces/known'
 
 print("Creando embeddings")
-
-model = DeepFace.build_model("Facenet")
 
 for person in os.listdir(dir):
 

@@ -1,5 +1,6 @@
 import os
 import cv2
+import time
 import queue
 import joblib
 import threading
@@ -7,9 +8,14 @@ import numpy as np
 from sklearn import svm
 from deepface import DeepFace
 
+from utils import sound
+
 class FaceRecognition():
-    def __init__(self):
-        self.timer = 0
+    def __init__(self,on_alert=None):
+        self.unknown_start_time = None
+        self.sent_alert = False
+        self.on_alert = on_alert
+        self.time_end = 0
         self.pred = '.'
         self.results = []
         self.face_detector = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
@@ -87,6 +93,9 @@ class FaceRecognition():
                 except Exception as e:
                     print("Error en worker:", e)
 
+    def save_unknown_face(frame):
+        pass
+
     def findFaces(self,cap, debug=False):
         while True:
 
@@ -101,7 +110,12 @@ class FaceRecognition():
             if not self.result_queue.empty():
                self.results = self.result_queue.get()
 
+            unknown_face = False
+
             for result in self.results:
+                    
+                if result['name'] == 'Desconocido':
+                    unknown_face = True
 
                 x, y, w, h = result["box"]
                 name = result["name"]
@@ -123,6 +137,29 @@ class FaceRecognition():
                     (0, 255, 0),
                     2
                 )
+
+            current_time = time.perf_counter()
+
+            if unknown_face:
+
+                if self.unknown_start_time is None:
+                    self.unknown_start_time = current_time
+
+                elapsed = current_time - self.unknown_start_time
+
+                if elapsed >= 10 and not self.sent_alert:
+
+                    self.on_alert('Cara desconocida',frame)
+
+                    sound()
+
+                    self.sent_alert = True
+                    self.unknown_start_time = None
+                    self.sent_alert = False
+            else:
+
+                self.unknown_start_time = None
+                self.sent_alert = False
 
             if debug:
                 cv2.imshow("Video", frame)

@@ -1,11 +1,7 @@
 id,title,text,time,level
-1,Movimiento Detectado,Movimiento sospechoso cerca de la puerta del conductor,2026-04-08 21:45:30.123456,0
-2,Movimiento Detectado,Movimiento sospechoso cerca de la puerta del conductor,2026-04-08 21:45:30.123456,1
-3,Movimiento Detectado,Movimiento sospechoso cerca de la puerta del conductor,2026-04-08 21:45:30.123456,2
-4,Movimiento Detectado,Movimiento sospechoso cerca de la puerta del conductor,2026-04-08 21:45:30.123456,0
-5,Movimiento Detectado,Movimiento sospechoso cerca de la puerta del conductor,2026-04-08 21:45:30.123456,1
-6,Movimiento Detectado,Movimiento sospechoso cerca de la puerta del conductor,2026-04-08 21:45:30.123456,2
-7,Movimiento Detectado,Movimiento sospechoso cerca de la puerta del conductor,2026-04-08 21:45:30.123456,0
-8,Movimiento Detectado,Movimiento sospechoso cerca de la puerta del conductor,2026-04-08 21:45:30.123456,1
-9,Movimiento Detectado,Movimiento sospechoso cerca de la puerta del conductor,2026-04-08 21:45:30.123456,2
-10,Movimiento Detectado,Movimiento sospechoso cerca de la puerta del conductor,2026-04-08 21:45:30.123456,0
+5,Cara desconocida detectada,Una cara desconocida fue detectada,14:14:26,2
+4,Cara desconocida detectada,Una cara desconocida fue detectada,14:14:26,2
+3,Cara desconocida detectada,Una cara desconocida fue detectada,14:14:26,2
+2,Cara desconocida detectada,Una cara desconocida fue detectada,14:14:26,2
+1,Cara desconocida detectada,Una cara desconocida fue detectada,14:14:26,2
+0,Cara desconocida detectada,Una cara desconocida fue detectada,14:14:26,2
