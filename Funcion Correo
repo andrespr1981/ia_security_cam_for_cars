@@ -44,3 +44,10 @@ def enviar_alerta_correo(destinatario, motivo_alerta="Movimiento sospechoso"):
     except Exception as e:
         print(f"Error al enviar el correo: {e}")
         return False
+
+-------------------------------------------------------------------------------------
+## Para hacer esta parte leer primero "FuncionCorreo README.md"
+
+# Ejemplo de uso cuando la IA detecta algo:
+if alerta_detectada:
+    enviar_alerta_correo("correo_del_usuario@gmail.com", "Se detectó un conductor no autorizado")
