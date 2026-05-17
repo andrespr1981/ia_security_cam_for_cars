@@ -36,7 +36,7 @@ def insert_row(reason):
                     'text':'Se detecto una persona no identificada en el vehiculo, se guardo una fotografia de su rostro en la galeria de fotos tomadas.',
                     'time':f'{now.tm_hour}:{now.tm_min}:{now.tm_sec}',
                     'level':2}
-        if reason == 'Movimiento':
+        if reason == 'Movimiento extraño detectado':
             data = {'id':int(alerts[0]['id']) + 1,
                     'title':reason,
                     'text':'Se detecto movimiento constante en el vehiculo, y se guardo una fotografia en la galeria de fotos tomadas.',

@@ -1,17 +1,17 @@
-import time
-
+import os
 import cv2
+import time
 import base64
 import asyncio
 import flet as ft
 from components.navbar import Navbar
 from views.photos_views import photos_view
-#from FaceRecognition import FaceRecognition
+from FaceRecognition import FaceRecognition
 from utils.csv_handler import insert_row, read_csv,write_csv
 from components.info_container import info_container
 from components.alert_container import alert_container, mini_alert_container
 
-#cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(0)
 
 def main(page: ft.Page):
     page.title = 'Driver Guard'
@@ -47,11 +47,15 @@ def main(page: ft.Page):
         insert_row(reason)
         load_alerts()
         
-    #detector = FaceRecognition(on_alert=create_alert)
+    detector = FaceRecognition(on_alert=create_alert)
+    dir = 'faces/unknown'
+    photos = 0
+    for _ in os.listdir(dir):
+        photos += 1
     ia_activated = {'state':True}
-    today_alerts = 90
-    storage = 90
+    storage = photos
     alerts = read_csv()
+    today_alerts = len(alerts)
 
     video = ft.Image(src='images/test.jpg',gapless_playback=True,border_radius=ft.BorderRadius.all(20))
     video_container = ft.Container(content=video,alignment=ft.Alignment.CENTER,width=800,border=ft.BorderRadius.all(10))
@@ -160,7 +164,7 @@ def main(page: ft.Page):
             page.update()
             await asyncio.sleep(0.03)
           
-    #page.run_task(video_loop)
+    page.run_task(video_loop)
                 
 
 ft.run(main)
