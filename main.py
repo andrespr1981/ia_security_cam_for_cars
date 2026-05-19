@@ -7,7 +7,7 @@ import flet as ft
 from components.navbar import Navbar
 from views.photos_views import photos_view
 from FaceRecognition import FaceRecognition
-from utils.csv_handler import insert_row, read_csv,write_csv
+from utils.csv_handler import insert_row, read_csv
 from components.info_container import info_container
 from components.alert_container import alert_container, mini_alert_container
 

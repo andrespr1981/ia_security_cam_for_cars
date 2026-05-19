@@ -86,7 +86,7 @@ class FaceRecognition():
 
                         min_dist = min(distancias)
 
-                        if max_proba < 0.8 or min_dist > 10 or min_dist < 3:
+                        if max_proba < 0.8 or min_dist > 10:
                             pred = "Desconocido"
                         else:
                             pred = pred_class
@@ -100,7 +100,7 @@ class FaceRecognition():
                         self.result_queue.put(results)
 
                 except Exception as e:
-                    print("Error en worker:", e)
+                    print("Error:", e)
 
     def motion_worker(self):
 
@@ -180,12 +180,15 @@ class FaceRecognition():
         current_time = time.perf_counter()
 
         unknown_face = False
+        known_face = False
         face_detected = len(self.results) > 0
 
         for result in self.results:
                 
             if result['name'] == 'Desconocido':
                 unknown_face = True
+            else:
+                known_face = True
 
             x, y, w, h = result["box"]
             name = result["name"]
@@ -208,7 +211,7 @@ class FaceRecognition():
                 2
             )
 
-        if unknown_face:
+        if unknown_face and not known_face:
 
             if self.unknown_start_time is None:
                 self.unknown_start_time = current_time
