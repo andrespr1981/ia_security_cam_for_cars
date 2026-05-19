@@ -150,6 +150,11 @@ class FaceRecognition():
         ret, frame = cap.read()
         if not ret:
             return
+        
+        frame = cv2.resize(
+            frame,
+            (640, 480)
+        )
 
         if not self.frame_queue.full():
             self.frame_queue.put(frame.copy())
@@ -225,7 +230,8 @@ class FaceRecognition():
                     target=send_email,
                     args=(
                         'al22760571@ite.edu.mx',
-                        'Cara desconocida'
+                        'Cara desconocida',
+                        frame
                     ),
                     daemon=True
                 ).start()
