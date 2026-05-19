@@ -5,7 +5,7 @@ import queue
 import joblib
 import threading
 import numpy as np
-from utils import sound
+from utils.sound import play_sound
 from sklearn import svm
 from deepface import DeepFace
 from utils.send_email import send_email
@@ -39,8 +39,8 @@ class FaceRecognition():
 
         self.worker_thread = threading.Thread(target=self.embedding_worker, daemon=True)
         self.worker_thread.start()
-        self.motion_thread = threading.Thread(target=self.motion_worker,daemon=True)
-        self.motion_thread.start()
+        #self.motion_thread = threading.Thread(target=self.motion_worker,daemon=True)
+        #self.motion_thread.start()
     
     def embedding_worker(self):
 
@@ -226,7 +226,10 @@ class FaceRecognition():
                     ),
                     daemon=True
                 ).start()
-                sound()
+                threading.Thread(
+                    target=play_sound,
+                    daemon=True
+                ).start()
 
                 self.sent_alert = True
                 self.unknown_start_time = None
@@ -266,7 +269,7 @@ class FaceRecognition():
                 ).start()
 
                 threading.Thread(
-                    target=sound,
+                    target=play_sound,
                     daemon=True
                 ).start()
 

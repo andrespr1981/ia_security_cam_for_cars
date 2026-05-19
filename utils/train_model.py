@@ -37,7 +37,7 @@ for person in os.listdir(dir):
 print("Embeddings:", len(embeddings))
 print("Labels:", len(labels))
 
-print("Entrenando modelo...")
+print("Entrenando modelo")
 
 model = svm.SVC(
     kernel='linear',

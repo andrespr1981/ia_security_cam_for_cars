@@ -1,7 +1,10 @@
-import random
-from playsound import playsound 
+import pygame
 
-def sound():
-    sounds = ['sounds/alarm.mp3','sounds/fart.mp3','sounds/oof.mp3']
-    choice = random.choice(sounds)
-    playsound(choice)
+pygame.mixer.init()
+
+def play_sound():
+
+    if not pygame.mixer.music.get_busy():
+
+        pygame.mixer.music.load("sounds/alarm.mp3")
+        pygame.mixer.music.play()

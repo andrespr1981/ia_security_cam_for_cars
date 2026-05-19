@@ -19,7 +19,8 @@ def mini_alert_container(alert_id,title,text,time,level,refresh):
             controls=[
                 ft.Column(
                 controls=[
-                ft.Row(controls=[
+                ft.Row(
+                    controls=[
                     ft.Container(
                         width=10,
                         height=10,
@@ -27,7 +28,14 @@ def mini_alert_container(alert_id,title,text,time,level,refresh):
                         bgcolor=color),
                     ft.Text(value=title)
                 ]),
-                ft.Text(value=text),
+                ft.Text(
+    value=text,
+    width=500,              # ancho máximo
+    selectable=True,        # permite copiar
+    overflow="visible",     # o "clip", "ellipsis"
+    max_lines=None,         # sin límite de líneas
+),
+
                 ft.Text(value=time)
                 ],
             ),
